@@ -1,6 +1,6 @@
 # Ian's Tuition Attendance Tracker
 
-Streamlit app that records attendance at Teacher Zhou's Center into a Google Sheet and shows a summary.
+Streamlit app that records attendance at Ian's tuition @ Mdm Zhou into a Google Sheet and shows a summary.
 
 ## One-time Google setup
 1. In Google Cloud Console, create a project and enable the **Google Sheets API** and **Google Drive API**.

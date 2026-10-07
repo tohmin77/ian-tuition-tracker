@@ -261,7 +261,7 @@ if len(same_day) >= 2:
 
 balance = summary.credit_balance(df, credits_df)
 remaining_slot.markdown(
-    f"**📚 Teacher Zhou's Center** · **{balance['remaining']} hrs** left"
+    f"**📚 Ian's tuition @ Mdm Zhou** · **{balance['remaining']} hrs** left"
 )
 
 with summary_tab:
