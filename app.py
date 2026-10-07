@@ -2,6 +2,7 @@ from datetime import date, datetime, time
 
 import altair as alt
 import streamlit as st
+import streamlit.components.v1 as components
 
 from tracker import edits, summary
 from tracker.models import Credit, Entry, duration_hours
@@ -11,7 +12,7 @@ DEFAULT_SESSION_MINUTES = 120
 SUBJECTS = ["Science", "Mathematics"]
 SUBJECT_COLORS = {"Science": "#2a9d8f", "Mathematics": "#e76f51", "(none)": "#adb5bd"}
 
-st.set_page_config(page_title="Ian's Tuition Tracker", page_icon="📚")
+st.set_page_config(page_title="Ian's Tuition Tracker", page_icon="static/icon-512.png")
 st.markdown(
     """
     <style>
@@ -108,6 +109,21 @@ if "start_h" not in st.session_state:
 st.session_state.setdefault("edit_ver", 0)
 if flash := st.session_state.pop("flash", None):
     st.toast(flash)
+
+
+components.html(
+    """
+    <script>
+    const head = window.parent.document.head;
+    head.querySelectorAll('link[rel="apple-touch-icon"]').forEach(l => l.remove());
+    const link = window.parent.document.createElement('link');
+    link.rel = 'apple-touch-icon';
+    link.href = '/app/static/apple-touch-icon.png';
+    head.appendChild(link);
+    </script>
+    """,
+    height=0,
+)
 
 
 def fmt_time(text: str) -> str:

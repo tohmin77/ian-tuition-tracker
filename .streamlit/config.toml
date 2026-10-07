@@ -1,2 +1,5 @@
 [theme]
 baseFontSize = 18
+
+[server]
+enableStaticServing = true
