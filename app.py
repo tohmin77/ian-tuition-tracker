@@ -27,7 +27,11 @@ st.markdown(
     div[data-baseweb="popover"] li * {
         font-size: 16px !important;
     }
-    .st-key-save_attendance button,
+    .st-key-save_attendance button {
+        background-color: #b7e4c7;
+        border-color: #95d5b2;
+        color: #1b4332;
+    }
     .st-key-add_credits button {
         background-color: #e9ecef;
         border-color: #dee2e6;
