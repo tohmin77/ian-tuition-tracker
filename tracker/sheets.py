@@ -18,8 +18,11 @@ class AttendanceSheet:
         self.credits_ws = credits_worksheet
 
     @classmethod
-    def connect(cls, service_account_file: str, sheet_id: str) -> "AttendanceSheet":
-        client = gspread.service_account(filename=service_account_file)
+    def connect(cls, credentials: str | dict, sheet_id: str) -> "AttendanceSheet":
+        if isinstance(credentials, dict):
+            client = gspread.service_account_from_dict(credentials)
+        else:
+            client = gspread.service_account(filename=credentials)
         book = client.open_by_key(sheet_id)
         try:
             credits_ws = book.worksheet(CREDITS_TAB)

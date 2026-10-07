@@ -41,9 +41,12 @@ st.markdown(
 
 @st.cache_resource
 def get_sheet() -> AttendanceSheet:
-    sheet = AttendanceSheet.connect(
-        st.secrets["service_account_file"], st.secrets["sheet_id"]
+    credentials = (
+        dict(st.secrets["gcp_service_account"])
+        if "gcp_service_account" in st.secrets
+        else st.secrets["service_account_file"]
     )
+    sheet = AttendanceSheet.connect(credentials, st.secrets["sheet_id"])
     sheet.ensure_header()
     return sheet
 

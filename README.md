@@ -20,3 +20,16 @@ streamlit run app.py
 ```
 pytest
 ```
+
+## Deploy to Streamlit Community Cloud (use from a phone)
+1. Push this repo to GitHub (never commit the key file; `credentials/` is git-ignored).
+2. At https://share.streamlit.io create an app from the repo with main file `app.py`.
+3. In the app's **Settings → Secrets**, paste:
+   ```
+   sheet_id = "<your sheet id>"
+
+   [gcp_service_account]
+   type = "service_account"
+   ... (the fields from your JSON key)
+   ```
+4. In **Settings → Sharing**, restrict viewing to specific people so only you can open it.
