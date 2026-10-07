@@ -28,15 +28,18 @@ st.markdown(
     div[data-baseweb="popover"] li * {
         font-size: 16px !important;
     }
-    .st-key-save_attendance button {
+    .st-key-save_attendance button,
+    .st-key-save_att_edits button,
+    .st-key-save_credit_edits button {
         background-color: #b7e4c7;
         border-color: #95d5b2;
         color: #1b4332;
     }
+    .st-key-confirm_add_credits button,
     .st-key-add_credits button {
-        background-color: #e9ecef;
-        border-color: #dee2e6;
-        color: #6c757d;
+        background-color: #bde0fe;
+        border-color: #a2d2ff;
+        color: #1d3557;
     }
     </style>
     """,
@@ -194,7 +197,7 @@ def add_credits_dialog() -> None:
     credit_day = st.date_input("Date purchased", value=date.today())
     hours = st.number_input("Hours purchased", min_value=0.5, value=10.0, step=0.5)
     note = st.text_input("Note (optional)", placeholder="e.g. 10-hour package")
-    if st.button("Add credits", type="primary"):
+    if st.button("Add credits", key="confirm_add_credits"):
         try:
             sheet.add_credit(Credit(credit_day, hours, note))
         except ValueError as exc:
