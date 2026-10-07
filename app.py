@@ -268,6 +268,10 @@ with summary_tab:
         m2.metric("Hours", t["hours"])
         m3.metric("Avg / session", t["avg_hours"])
 
+        st.subheader("Attendance log")
+        st.caption("Edit a cell or tick 🗑 to delete a row, then save.")
+        attendance_editor(df)
+
         monthly = summary.by_month_subject(df)
         st.subheader("Hours by month and subject")
         chart = (
@@ -289,7 +293,3 @@ with summary_tab:
         )
         st.altair_chart(chart, width="stretch")
         st.dataframe(monthly, hide_index=True, width="stretch")
-
-        st.subheader("Attendance log")
-        st.caption("Edit a cell or tick 🗑 to delete a row, then save.")
-        attendance_editor(df)
