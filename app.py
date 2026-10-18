@@ -1,3 +1,4 @@
+import hmac
 from datetime import date, datetime, time
 
 import altair as alt
@@ -41,10 +42,33 @@ st.markdown(
         border-color: #a2d2ff;
         color: #1d3557;
     }
+    div[data-testid="stMetricValue"] { font-size: 1.6rem; }
+    .chart-title { font-size: 1.05rem; font-weight: 600; white-space: nowrap; margin: 0.5rem 0 0; }
     </style>
     """,
     unsafe_allow_html=True,
 )
+
+
+def check_passcode() -> None:
+    if st.session_state.get("authed"):
+        return
+    expected = st.secrets.get("app_passcode")
+    if not expected:
+        st.error("Passcode is not configured. Add `app_passcode` to the app secrets.")
+        st.stop()
+    with st.form("passcode_form"):
+        entered = st.text_input("Passcode", type="password")
+        submitted = st.form_submit_button("Open", width="stretch")
+    if submitted:
+        if hmac.compare_digest(entered.encode(), str(expected).encode()):
+            st.session_state["authed"] = True
+            st.rerun()
+        st.error("Incorrect passcode.")
+    st.stop()
+
+
+check_passcode()
 
 
 @st.cache_resource
@@ -265,10 +289,11 @@ remaining_slot.markdown(
 )
 
 with summary_tab:
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Purchased", balance["purchased"])
-    c2.metric("Used", balance["used"])
-    c3.metric("Remaining", balance["remaining"])
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Purchased (hr)", balance["purchased"])
+    c2.metric("Used (hr)", balance["used"])
+    c3.metric("Bal (hr)", balance["remaining"])
+    c4.metric("Sessions", len(df))
     if balance["remaining"] < 0:
         st.warning(f"Attendance exceeds purchased credits by {-balance['remaining']} hrs.")
     if st.button("➕ Add time credits", key="add_credits", width="stretch"):
@@ -281,34 +306,41 @@ with summary_tab:
     if df.empty:
         st.info("No attendance recorded yet.")
     else:
-        t = summary.totals(df)
-        m1, m2, m3 = st.columns(3)
-        m1.metric("Sessions", t["sessions"])
-        m2.metric("Hours", t["hours"])
-        m3.metric("Avg / session", t["avg_hours"])
-
         st.subheader("Attendance log")
         st.caption("Edit a cell or tick 🗑 to delete a row, then save.")
         attendance_editor(df)
 
         monthly = summary.by_month_subject(df)
-        st.subheader("Hours by month and subject")
-        chart = (
-            alt.Chart(monthly)
-            .mark_bar()
-            .encode(
-                x=alt.X("Month:N", title=None, axis=alt.Axis(labelAngle=0)),
-                y=alt.Y("Hours:Q", title="Hours"),
-                color=alt.Color(
-                    "Subject:N",
-                    scale=alt.Scale(
-                        domain=list(SUBJECT_COLORS), range=list(SUBJECT_COLORS.values())
-                    ),
-                    legend=alt.Legend(orient="bottom", title=None),
-                ),
-                tooltip=["Month", "Subject", "Sessions", "Hours"],
-            )
-            .properties(height=260)
+        st.markdown(
+            '<p class="chart-title">Hours by month and subject</p>', unsafe_allow_html=True
         )
-        st.altair_chart(chart, width="stretch")
-        st.dataframe(monthly, hide_index=True, width="stretch")
+        totals = monthly.groupby("Month", as_index=False)["Hours"].sum()
+        base = alt.Chart(monthly).transform_stack(
+            as_=["y0", "y1"], stack="Hours", groupby=["Month"], sort=[alt.SortField("Subject")]
+        )
+        bars = base.mark_bar().encode(
+            x=alt.X("Month:N", title=None, axis=alt.Axis(labelAngle=0)),
+            y=alt.Y("y0:Q", title="Hours"),
+            y2="y1:Q",
+            color=alt.Color(
+                "Subject:N",
+                scale=alt.Scale(
+                    domain=list(SUBJECT_COLORS), range=list(SUBJECT_COLORS.values())
+                ),
+                legend=alt.Legend(orient="bottom", title=None),
+            ),
+            tooltip=["Month", "Subject", "Sessions", "Hours"],
+        )
+        segment_labels = (
+            base.transform_calculate(mid="(datum.y0 + datum.y1) / 2")
+            .mark_text(color="white", fontSize=12)
+            .encode(x="Month:N", y="mid:Q", text=alt.Text("Hours:Q", format=".1f"))
+        )
+        total_labels = (
+            alt.Chart(totals)
+            .mark_text(dy=-8, fontSize=13, fontWeight="bold")
+            .encode(x="Month:N", y="Hours:Q", text=alt.Text("Hours:Q", format=".1f"))
+        )
+        st.altair_chart(
+            (bars + segment_labels + total_labels).properties(height=260), width="stretch"
+        )
