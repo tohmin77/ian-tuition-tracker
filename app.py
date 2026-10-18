@@ -49,7 +49,7 @@ st.markdown(
         overflow: visible;
         text-overflow: clip;
     }
-    .chart-title { font-size: 1.05rem; font-weight: 600; white-space: nowrap; margin: 0.5rem 0 0; }
+    .chart-title { font-size: 1.05rem; font-weight: 600; white-space: nowrap; line-height: 1.6; margin: 0.5rem 0 0; padding-bottom: 0.5rem; }
     </style>
     """,
     unsafe_allow_html=True,
