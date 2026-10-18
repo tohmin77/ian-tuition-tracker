@@ -43,6 +43,12 @@ st.markdown(
         color: #1d3557;
     }
     div[data-testid="stMetricValue"] { font-size: 1.6rem; }
+    [data-testid="stMetricLabel"] * {
+        font-size: 0.7rem;
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: clip;
+    }
     .chart-title { font-size: 1.05rem; font-weight: 600; white-space: nowrap; margin: 0.5rem 0 0; }
     </style>
     """,
@@ -292,8 +298,8 @@ with summary_tab:
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Purchased (hr)", balance["purchased"])
     c2.metric("Used (hr)", balance["used"])
-    c3.metric("Bal (hr)", balance["remaining"])
-    c4.metric("Sessions", len(df))
+    c3.metric("Sessions", len(df))
+    c4.metric("Bal (hr)", balance["remaining"])
     if balance["remaining"] < 0:
         st.warning(f"Attendance exceeds purchased credits by {-balance['remaining']} hrs.")
     if st.button("➕ Add time credits", key="add_credits", width="stretch"):
